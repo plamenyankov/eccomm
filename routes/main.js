@@ -10,7 +10,27 @@ Product.createMapping(function (err, mapping) {
         console.log(mapping);
     }
 });
+function pagination(req,res,next){
+    var perPage = 9;
+    var page = req.params.page;
 
+    Product
+        .find()
+        .skip(perPage*page)
+        .limit(perPage)
+        .populate('Category')
+        .exec(function(err,products){
+            if(err) return next(err);
+            Product.count().exec(function(err,count) {
+                if (err) return next(err);
+
+                res.render('main/product-main',{
+                    products:products,
+                    pages: count/perPage
+                });
+            });
+        });
+}
 var stream = Product.synchronize();
 var count = 0;
 stream.on('data', function () {
@@ -24,8 +44,15 @@ stream.on('error', function (err) {
 });
 
 router.get('/', function (req, res, next) {
+    if(req.user){
+        pagination(req,res,next);
+    }else{
     res.render('main/home');
+    }
 
+});
+router.get('/page/:page', function (req, res, next) {
+        pagination(req,res,next);
 });
 router.post('/search', function (req, res, next) {
     res.redirect('/search?q=' + req.body.q);
