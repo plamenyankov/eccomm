@@ -4,6 +4,7 @@ var mongoose = require("mongoose");
 var conf = require("./config");
 var bodyParser = require("body-parser");
 var User = require("./models/users");
+var Category = require("./models/category");
 var ejs = require("ejs");
 var engine = require("ejs-mate");
 var session = require("express-session");
@@ -13,6 +14,8 @@ var MongoStore = require("connect-mongo")(session);
 var passport = require("passport");
 var main = require("./routes/main");
 var users = require("./routes/user");
+var admin = require("./routes/admin");
+var api = require("./api/api");
 mongoose.connect(conf.getDbConnectionConfig());
 
 var app = express();
@@ -33,11 +36,21 @@ app.use(function (req, res, next) {
     res.locals.user = req.user;
     next();
 });
+app.use(function (req, res, next) {
+    Category.find({},function(err,category){
+        if(err) return next(err);
+        res.locals.categories = category;
+        next();
+    });
+
+});
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(main);
 app.use(users);
+app.use(admin);
+app.use('/api',api);
 app.engine("ejs", engine);
 app.set("view engine", 'ejs');
 app.listen(3000, function (err) {

@@ -1,6 +1,17 @@
 <%- layout('layout') -%>
 <div class="row">
-    <div class="col-sm-6"><img src="<%=user.profile.picture%>" alt="" class="img-circle img-responsive img-center"/></div>
-    <br/>
+    <div class="col-sm-6"><img src="<%=user.profile.picture%>" alt="" class="img-circle img-responsive img-center"/>
+
     <p>hello, <%=user.profile.name%></p>
+    <p>Email: <%=user.email%></p>
+    <p>Address:
+        <% if(user.address){%>
+        <%=user.address%>
+        <%}else{%>
+<span style="color:red; font-weight: bold;">You have no address</span>
+
+        <%}%>
+    </p>
+    <a href="/edit-profile" class="btn btn-primary btn-lg">Edit profile</a>
+    </div>
 </div>
